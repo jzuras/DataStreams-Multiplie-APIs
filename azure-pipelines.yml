@@ -1,0 +1,132 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- main
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+- checkout: self
+
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+
+# Publish StreamApi
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'StreamApi/StreamApi.csproj'
+    arguments: '-o $(System.DefaultWorkingDirectory)/StreamApi'
+    modifyOutputPath: true
+    zipAfterPublish: true
+
+# Deploy StreamApi
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Mostly-Free-12-Months(8ba3d120-78b2-4fbe-8956-22e414d124b2)'
+    appType: 'webApp'
+    WebAppName: 'DataStreamsApp'
+    VirtualApplication: '/StreamApi'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/StreamApi/**/*.zip'
+    enableCustomDeployment: true
+    DeploymentType: webDeploy
+
+
+# Publish DataRestfulApi
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'DataRestfulApi/DataRestfulApi.csproj'
+    arguments: '-o $(System.DefaultWorkingDirectory)/DataRestfulApi'
+    modifyOutputPath: true
+    zipAfterPublish: true
+
+# Deploy DataRestfulApi
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Mostly-Free-12-Months(8ba3d120-78b2-4fbe-8956-22e414d124b2)'
+    appType: 'webApp'
+    WebAppName: 'DataStreamsApp'
+    VirtualApplication: '/DataRestfulApi'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/DataRestfulApi/**/*.zip'
+    enableCustomDeployment: true
+    DeploymentType: webDeploy
+
+
+# Publish DataMinimalApi
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'DataMinimalApi/DataMinimalApi.csproj'
+    arguments: '-o $(System.DefaultWorkingDirectory)/DataMinimalApi'
+    modifyOutputPath: true
+    zipAfterPublish: true
+
+# Deploy DataMinimalApi
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Mostly-Free-12-Months(8ba3d120-78b2-4fbe-8956-22e414d124b2)'
+    appType: 'webApp'
+    WebAppName: 'DataStreamsApp'
+    VirtualApplication: '/DataMinimalApi'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/DataMinimalApi/**/*.zip'
+    enableCustomDeployment: true
+    DeploymentType: webDeploy
+
+
+# Publish DataSoapApi
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'DataSoapApi/DataSoapApi.csproj'
+    arguments: '-o $(System.DefaultWorkingDirectory)/DataSoapApi'
+    modifyOutputPath: true
+    zipAfterPublish: true
+
+# Deploy DataSoapApi
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Mostly-Free-12-Months(8ba3d120-78b2-4fbe-8956-22e414d124b2)'
+    appType: 'webApp'
+    WebAppName: 'DataStreamsApp'
+    VirtualApplication: '/DataSoapApi'
+    packageForLinux: '$(System.DefaultWorkingDirectory)/DataSoapApi/**/*.zip'
+    enableCustomDeployment: true
+    DeploymentType: webDeploy
+
+
+# Publish DataStreams
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    projects: 'DataStreams/DataStreams.csproj'
+    arguments: '-o $(publishDirectory)/DataStreams'
+    modifyOutputPath: true
+    zipAfterPublish: true
+
+# Deploy DataStreams to the root of the Web App
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'Mostly-Free-12-Months(8ba3d120-78b2-4fbe-8956-22e414d124b2)'
+    appType: 'webApp'
+    WebAppName: 'DataStreamsApp'
+    packageForLinux: '$(publishDirectory)/DataStreams/**/DataStreams.zip'
+    enableCustomDeployment: true
+    DeploymentType: webDeploy

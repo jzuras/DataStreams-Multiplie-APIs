@@ -1,0 +1,69 @@
+﻿<style>
+    #partialContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    #sectionsContainer {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    #updateSection,
+    #rapidUpdateSection {
+        width: 48%; /* Adjust the width as needed */
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    textarea {
+        width: 100%;
+    }
+
+    #rapidUpdateButton {
+        margin-top: 10px;
+    }
+</style>
+
+<div id="partialContainer">
+    <div class="mb-3">
+        Displaying Stream: @Model.CurrentlySelectedStream
+        <input type="hidden" id="assignedID" value="@Model.IdAssignedByApi" />
+        <input type="hidden" id="apiType" value="@Model.ApiType" />
+        <input type="hidden" id="version" value="@Model.Version" />
+    </div>
+
+    <div id="sectionsContainer">
+        <div id="updateSection">
+            <div class="mb-3">
+                <label for="updateTextbox" )>API Response:</label>
+                <textarea id="updateTextbox" rows="6" readonly)></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="intervalSlider">Update Interval (0.1 to 5 seconds):</label>
+                <input type="range" id="intervalSlider" min="1" max="50" step="1" value="10" @(Model.IsStreamSelected ? "" : "disabled") />
+                <span id="intervalValue">1</span> second(s)
+            </div>
+
+            <div>
+                <button id="startStopButton" onclick="startStopTimer()" @(Model.IsStreamSelected ? "" : "disabled")>Start Timer</button>
+            </div>
+        </div>
+
+        <div id="rapidUpdateSection">
+            <label for="apiCallsCount">API Calls in 3 seconds:</label>
+            <input type="text" id="apiCallsCount" readonly />
+
+            <button id="rapidUpdateButton" onclick="runRapidUpdate()"  @(Model.IsStreamSelected ? "" : "disabled")>Run as fast as possible for 3 seconds</button>
+        </div>
+    </div>
+</div>

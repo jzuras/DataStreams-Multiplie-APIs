@@ -1,0 +1,122 @@
+﻿@model StreamViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h4>Available Streams</h4>
+    <div id="streamTable" class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Display</th>
+                    <th>Name</th>
+                    <th>Min Value</th>
+                    <th>Max Value</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <form asp-action="Create" method="post">
+                    <td></td>
+                    <td><input asp-for="EmptyStream.Name" placeholder="Enter Name" /></td>
+                    <td><input asp-for="EmptyStream.MinValue" placeholder="Enter Min Value" /></td>
+                    <td><input asp-for="EmptyStream.MaxValue" placeholder="Enter Max Value" /></td>
+                    <td><button type="submit" class="btn btn-success tableButton">Create</button></td>
+                    <td></td>
+                    </form>
+                </tr>
+                @foreach (var item in Model.StreamList)
+                {
+                    <tr>
+                        <td>
+                            <input type="hidden" class="hiddenName" name="name" value="@item.Name" />
+                            <button class="displayButton btn btn-success tableButton">Display</button>
+                        </td>
+                        <td>@item.Name</td>
+                        <td>@item.MinValue</td>
+                        <td>@item.MaxValue</td>
+                        <td>
+                            <button class="editButton btn btn-warning tableButton" data-name="@item.Name">Edit</button>
+                        </td>
+                        <td>
+                            <form asp-action="Delete" method="post">
+                                <input type="hidden" name="name" value="@item.Name" />
+                                <button type="submit" class="btn btn-danger tableButton">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<p></p>
+
+<!-- Modal for editing -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Stream</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" asp-action="Edit" method="post">
+                    <div class="form-group">
+                        <label for="editNameInput">Name:</label>
+                        <input type="text" class="form-control" id="editNameInput" name="Name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editMinValueInput">Min Value:</label>
+                        <input type="text" class="form-control" id="editMinValueInput" name="MinValue" placeholder="Enter Min Value" pattern="\d+" title="Please enter only digits" />
+                    </div>
+                    <div class="form-group">
+                        <label for="editMaxValueInput">Max Value:</label>
+                        <input type="text" class="form-control" id="editMaxValueInput" name="MaxValue" placeholder="Enter Max Value" pattern="\d+" title="Please enter only digits" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<br />
+@await Html.PartialAsync("_Stream")
+
+@await Html.PartialAsync("_StreamScripts")
+
+@section scripts {
+    <script>
+        function closeEditModal() {
+            $('#editModal').modal('hide');
+        }
+    </script>
+    <script>
+        // Handle edit button click.
+        $(document).ready(function () {
+            $(".editButton").on("click", function () {
+                var name = $(this).data("name");
+                var row = $(this).closest("tr");
+                var displayName = row.find("td:eq(1)").text();
+                var minValue = row.find("td:eq(2)").text();
+                var maxValue = row.find("td:eq(3)").text();
+
+                $("#editNameInput").val(displayName);
+                $("#editMinValueInput").val(minValue);
+                $("#editMaxValueInput").val(maxValue);
+
+                $("#editModal").modal("show");
+            });
+        });
+    </script>
+}
